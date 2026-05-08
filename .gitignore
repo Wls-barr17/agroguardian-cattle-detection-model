@@ -1,3 +1,4 @@
+
 # Virtual Environment
 venv/
 env/
@@ -61,3 +62,4 @@ data/videos/
 *.tmp
 .cache/
 test_results/
+
