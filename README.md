@@ -59,8 +59,8 @@ Video → Lectura Frames → Detección YOLOv8 → Tracking DeepSORT → Conteo 
 
 ### 1. Clonar Repositorio
 ```bash
-git clone https://github.com/Wls-barr17/agroguardian-model.git
-cd agroguardian-model
+git clone https://github.com/Wls-barr17/agroguardian-cattle-detection-model.git
+cd agroguardian-cattle-detection-model
 ```
 
 ### 2. Crear Virtual Environment
