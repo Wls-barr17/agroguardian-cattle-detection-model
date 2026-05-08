@@ -1,0 +1,14 @@
+# data.yaml - Configuración del dataset para entrenamiento YOLO
+# Estructura: datasets/cows/images/{train,val,test} + annotations/{train,val,test}
+
+path: ../datasets/cows  # Ruta del dataset
+train: images/train     # Imágenes de entrenamiento
+val: images/val         # Imágenes de validación
+test: images/test       # Imágenes de prueba (opcional)
+
+# Número de clases
+nc: 1  # Solo detectamos vacas
+
+# Nombres de las clases
+names:
+  0: cow  # Clase 0 = vaca

@@ -1,0 +1,18 @@
+# AgroGuardian Requirements
+# Sistema de detección y conteo de ganado bovino
+
+# Detección YOLO
+ultralytics>=8.0.0
+
+# Visión por computadora
+opencv-python>=4.8.0
+
+# Computación numérica
+numpy>=1.23.0
+
+# Tracking DeepSORT
+deep-sort-realtime>=1.1.1
+
+# (Opcional) Para GPU CUDA
+# torch>=2.0.0  # Si tienes GPU NVIDIA
+# torchvision>=0.15.0

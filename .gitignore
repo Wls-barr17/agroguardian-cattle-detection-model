@@ -1,0 +1,63 @@
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Dataset (muy grandes - no subir)
+data/datasets/cows/images/
+data/datasets/cows/labels/
+data/datasets/*/
+!data/datasets/data.yaml
+
+# Modelos (muy grandes - no subir)
+data/models/*.pt
+data/trained_models/
+!data/models/.gitkeep
+
+# Outputs de entrenamiento (generados)
+data/runs/
+data/outputs/
+
+# Videos (muy grandes)
+data/videos/
+
+# Otros
+*.log
+*.csv
+*.tmp
+.cache/
+test_results/
