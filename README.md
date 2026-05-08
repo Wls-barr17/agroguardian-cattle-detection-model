@@ -154,6 +154,30 @@ cd data/src
 python test_system.py
 ```
 
+## 🧪 Cómo Probar el Modelo (para Profesores/Evaluadores)
+
+Una vez clonado el repositorio y instalado (ver "🚀 Instalación Rápida"), puedes probar el sistema con tu propio video. Los videos de ejemplo no se incluyen en el repo para mantenerlo ligero, pero el modelo entrenado sí está disponible.
+
+### Pasos para Probar:
+1. **Asegúrate de tener un video**: Usa cualquier video MP4 con vacas (por ejemplo, grabado desde un dron). Colócalo en una carpeta accesible (ej. `C:\mis_videos\video_prueba.mp4`).
+
+2. **Ejecuta la inferencia**:
+   ```bash
+   cd data/src
+   python main.py --video /ruta/a/tu/video.mp4 --output /ruta/a/salida.mp4 --model ../trained_models/yolov8_cows_20260420.pt
+   ```
+   - Reemplaza `/ruta/a/tu/video.mp4` con la ruta real de tu video.
+   - El modelo entrenado (`yolov8_cows_YYYYMMDD.pt`) detectará y contará vacas en tiempo real.
+   - El video procesado se guardará en la ruta de `--output`.
+
+3. **Argumentos importantes**:
+   - `--video`: Ruta al video de entrada (obligatorio).
+   - `--model`: Usa el modelo en `../trained_models/` (ya incluido en el repo).
+   - `--conf`: Ajusta el umbral de confianza si es necesario (ej. 0.5 para más precisión).
+   - `--device`: Usa 'cuda' si tienes GPU NVIDIA para mayor velocidad.
+
+**Nota**: Si no hay modelo entrenado en `data/trained_models/`, puedes usar el modelo base de YOLOv8 (menos preciso para vacas específicas).
+
 ## 📁 Estructura del Proyecto
 
 ```

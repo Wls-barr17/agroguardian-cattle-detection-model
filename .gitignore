@@ -46,7 +46,6 @@ data/datasets/*/
 
 # Modelos (muy grandes - no subir)
 data/models/*.pt
-data/trained_models/
 !data/models/.gitkeep
 
 # Outputs de entrenamiento (generados)
