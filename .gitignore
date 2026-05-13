@@ -1,36 +1,29 @@
-
+# ======================
 # Virtual Environment
+# ======================
 venv/
 env/
 ENV/
 .venv/
 
+# ======================
 # Python
+# ======================
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
 build/
-develop-eggs/
 dist/
-downloads/
-eggs/
 .eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
 
+# ======================
 # IDE
+# ======================
 .vscode/
 .idea/
 *.swp
@@ -38,27 +31,43 @@ MANIFEST
 *~
 .DS_Store
 
-# Dataset (muy grandes - no subir)
-data/datasets/cows/images/
-data/datasets/cows/labels/
-data/datasets/*/
+# ======================
+# Dataset (pesado)
+# Mantener solo data.yaml
+data/datasets/cows/
 !data/datasets/data.yaml
 
-# Modelos (muy grandes - no subir)
-data/models/*.pt
-!data/models/.gitkeep
+# ======================
+# Modelo entrenado
+# Ignora todos EXCEPTO el final
+# ======================
+data/trained_models/*.pt
+!data/trained_models/yolov8_cows_20260513_033925.pt
+data/models/
 
-# Outputs de entrenamiento (generados)
+# ======================
+# Training artifacts YOLO
+# ======================
+data/src/runs/
 data/runs/
+runs/
+
+# YOLO checkpoints
+**/weights/epoch*.pt
+**/weights/last.pt
+
+# ======================
+# Videos y outputs
+# ======================
+data/videos/
 data/outputs/
 
-# Videos (muy grandes)
-data/videos/
-
-# Otros
+# ======================
+# Cache y temporales
+# ======================
+*.cache
 *.log
 *.csv
 *.tmp
 .cache/
 test_results/
-

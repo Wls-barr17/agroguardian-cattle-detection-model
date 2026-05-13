@@ -97,6 +97,8 @@ def main():
 
             # Paso 1: Detección
             detections = detector.predict(frame)
+            if frame_count % 30 == 0:
+                print(f"Frame {frame_count} | detections={len(detections)}")
 
             # Paso 2: Tracking
             tracks = tracker.update(detections, frame)

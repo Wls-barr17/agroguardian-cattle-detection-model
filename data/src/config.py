@@ -14,11 +14,11 @@ CONFIDENCE_THRESHOLD = 0.35  # Umbral de confianza para detección (0-1)
                               # Recomendado: 0.25-0.4
                               # OPTIMIZADO: Bboxes pequeños y precisos
 
-IOU_THRESHOLD = 0.60         # Umbral de IoU (Intersection over Union) para NMS
+IOU_THRESHOLD = 0.50        # Umbral de IoU (Intersection over Union) para NMS
                               # (Non-Maximum Suppression): elimina boxes duplicadas/solapadas
                               # Recomendado: 0.4-0.6
 
-IMGSZ = 1024                 # Tamaño de imagen para la red YOLO
+IMGSZ = 640             # Tamaño de imagen para la red YOLO
                               # Valores comunes: 416, 640, 1024
                               # Mayor = más precisión pero más lento
                               # Recomendado: 640 para balance
@@ -27,13 +27,13 @@ IMGSZ = 1024                 # Tamaño de imagen para la red YOLO
 DEVICE = 'cpu'               # 'cpu' para CPU, 'cuda' para GPU
                               # GPU es 10-20x más rápido si está disponible
 
-CLASSES = [16]               # Clases COCO a detectar
+CLASSES = [0]               # Clases COCO a detectar
                               # 16 = vaca (cow)
                               # 0 = persona (person)
                               # [16] = solo vacas
                               # [0, 16] = personas y vacas
 
-MODEL_PATH = '../models/yolov8s.pt'  # Ruta al modelo YOLO
+MODEL_PATH = './runs/runs/train_20260513_022538/weights/best.pt'  # Ruta al modelo YOLO
                                       # Opciones: '../models/yolov8n.pt' (nano)
                                       #           '../models/yolov8s.pt' (small - recomendado)
                                       #           '../models/yolov8m.pt' (medium)
@@ -43,11 +43,11 @@ MODEL_PATH = '../models/yolov8s.pt'  # Ruta al modelo YOLO
 # ==================== CONFIGURACIÓN TRACKER ====================
 # Parámetros del tracking (DeepSORT)
 
-MAX_AGE_TRACKER = 30         # Máximo número de frames que un track puede estar sin
+MAX_AGE_TRACKER = 50        # Máximo número de frames que un track puede estar sin
                               # actualización antes de ser eliminado (evita fantasmas)
                               # Recomendado: 20-50
 
-N_INIT_TRACKER = 2           # Número de frames para confirmar un track
+N_INIT_TRACKER = 5          # Número de frames para confirmar un track
                               # (evita contar detecciones falsas transitorias)
                               # Recomendado: 2-5
                               # OPTIMIZADO PARA VACAS EN MOVIMIENTO: 2 (confirma rápido)
@@ -55,19 +55,19 @@ N_INIT_TRACKER = 2           # Número de frames para confirmar un track
 # ==================== CONFIGURACIÓN DE CONTEO ====================
 # Parámetros para contar vacas de forma confiable
 
-MOVE_THRESH = 3.0            # Umbral de movimiento en píxeles
+MOVE_THRESH = 7.0            # Umbral de movimiento en píxeles
                               # Una vaca se considera "estacionaria" si no se mueve más de esto
                               # en STATIONARY_FRAMES frames
                               # Recomendado: 3-10
 
-STATIONARY_FRAMES = 10       # Número de frames consecutivos que una vaca debe estar
+STATIONARY_FRAMES = 15      # Número de frames consecutivos que una vaca debe estar
                               # estacionaria para ser contada
                               # Mayor = más confiable pero más lento
                               # Recomendado: 10-30
 
 # ==================== CONFIGURACIÓN DE PROCESAMIENTO ====================
 
-FRAME_SKIP = 1               # Procesar cada Nth frame (1 = procesar todos)
+FRAME_SKIP = 2               # Procesar cada Nth frame (1 = procesar todos)
                               # Aumentar para procesar más rápido pero con menos precisión
                               # Recomendado: 1 (procesar todos)
 

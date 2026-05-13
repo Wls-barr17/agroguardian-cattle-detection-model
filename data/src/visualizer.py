@@ -15,15 +15,13 @@ class Visualizer:
         """Define colores y etiquetas para clases COCO"""
         # Colores para cada clase (BGR)
         self.colors = {
-            0: (0, 0, 255),     # Persona: rojo
-            16: (0, 255, 0),    # Vaca: verde
-        }
-
-        # Etiquetas para cada clase
-        self.labels = {
-            0: "Persona",
-            16: "Vaca",
-        }
+            0: (0, 255, 0),   # Vaca (modelo actual)
+            1: (0, 0, 255),   # Persona (reservado futuro)
+            }
+        
+        self.labels = {0: "Vaca",
+                       1: "Persona",
+                       }
         
         # Fuente y tamaño para texto
         self.font = cv2.FONT_HERSHEY_SIMPLEX
@@ -57,12 +55,12 @@ class Visualizer:
             l, top, r, b = map(int, bbox)
 
             # Define color y espesor según estado
-            if cls == 16 and track_id in stationary_ids:
+            if cls == 0 and track_id in stationary_ids:
                 # Vaca ESTACIONARIA: VERDE, box grueso, con ID
                 color = (0, 255, 0)  # Verde
                 thickness = 3  # Box más grueso
                 show_id = True
-            elif cls == 16:
+            elif cls == 0:
                 # Vaca en MOVIMIENTO: AMARILLO, box fino, sin ID
                 color = (0, 255, 255)  # Amarillo
                 thickness = 1  # Box fino
@@ -78,7 +76,7 @@ class Visualizer:
 
             # Solo dibuja etiqueta si es estacionaria o persona
             if show_id:
-                if cls == 16:
+                if cls == 0:
                     label = f"ID {track_id}"  # Vacas: solo mostrar ID
                 else:
                     label = f"Persona #{track_id}"  # Personas: etiqueta completa
@@ -126,6 +124,7 @@ class Visualizer:
         total_cows = counts.get("total_cows", 0)
         active = counts.get("active_cows", 0)
         people = counts.get("people", 0)
+        show_people = people > 0
 
         # Línea 1: Vacas CONTADAS (estacionarias)
         text1 = f"VACAS CONTADAS (QUIETAS): {total_cows}"
@@ -146,10 +145,10 @@ class Visualizer:
         cv2.putText(frame, text2, (10, y2), self.font, self.font_scale, (0, 0, 0), 1, self.line_type)
         
         # Línea 3: Personas
-        text3 = f"Personas: {people}"
-        y3 = 85
-        
-        # Fondo para línea 3 (ROJO - personas)
-        (w3, h3), baseline3 = cv2.getTextSize(text3, self.font, self.font_scale, 1)
-        cv2.rectangle(frame, (5, y3 - h3 - 5), (15 + w3, y3 + baseline3 + 5), (0, 0, 200), -1)
-        cv2.putText(frame, text3, (10, y3), self.font, self.font_scale, (255, 255, 255), 1, self.line_type)
+        if show_people:
+            text3 = f"Personas: {people}"
+            y3 = 85
+            (w3, h3), baseline3 = cv2.getTextSize(text3, self.font, self.font_scale, 1)
+            
+            cv2.rectangle(frame, (5, y3 - h3 - 5), (15 + w3, y3 + baseline3 + 5), (0, 0, 200), -1)
+            cv2.putText(frame, text3, (10, y3), self.font, self.font_scale, (255, 255, 255), 1, self.line_type)

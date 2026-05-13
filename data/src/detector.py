@@ -57,7 +57,7 @@ class Detector:
             return []
 
         detections = []
-        min_box_area = 200  # área mínima de bbox para considerar (ajustable)
+        min_box_area = 100  # área mínima de bbox para considerar (ajustable)
                             # Reducido de 500 a 200 para detectar vacas pequeñas/lejanas
         frame_h, frame_w = frame.shape[:2]
 
@@ -83,6 +83,6 @@ class Detector:
                 detections.append((x1, y1, x2, y2, conf, cls))
 
         # (Opcional) Hook para métricas de calidad, logging, etc.
-        # print(f"Detecciones válidas: {len(detections)}")
+        print(f"Detecciones válidas: {len(detections)}")
 
         return detections

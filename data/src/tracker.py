@@ -42,9 +42,17 @@ class Tracker:
             return []
         
         try:
-            # Convierte detecciones al formato esperado por DeepSORT
-            # (bbox, confidence, class_id)
-            raw_detections = [(d[:4], d[4], d[5]) for d in detections]
+           # Convierte detecciones al formato esperado por DeepSORT
+           # DeepSORT espera: [x, y, width, height]
+            raw_detections = []
+            
+            for d in detections:
+                x1, y1, x2, y2, conf, class_id = d
+                # Convertir de XYXY → XYWH
+                w = x2 - x1
+                h = y2 - y1
+                
+                raw_detections.append(([x1, y1, w, h], conf, class_id))
             
             # Actualiza tracker con las nuevas detecciones
             tracks = self.tracker.update_tracks(
