@@ -87,7 +87,8 @@ class Counter:
             cls = int(t["class_id"])
             tid = t["track_id"]
             
-            if cls == 0: # Vaca (modelo actual)
+            # Procesar vacas (clase 0 en modelo entrenado)
+            if cls == 0:
                 self.active_cows += 1
                 
                 # Calcula centro del bounding box
@@ -102,17 +103,17 @@ class Counter:
                 if tid not in self.counted_stationary and self._is_stationary(tid):
                     self.counted_stationary.add(tid)
                     self.total_cows += 1
-                    
-                elif cls == 1:
-                # Persona (reservado para futuro)
-                    self.people_count += 1
+            
+            # Procesar personas (clase 1 - cuando se agregue al modelo)
+            elif cls == 1:
+                self.people_count += 1
         
         return {
             "total_cows": self.total_cows,
             "stationary_cows": len(self.counted_stationary),
             "active_cows": self.active_cows,
             "people": self.people_count,
-            "stationary_ids": self.counted_stationary.copy(),  # IDs de vacas estacionarias
+            "stationary_ids": self.counted_stationary.copy(),
         }
 
     def reset(self):

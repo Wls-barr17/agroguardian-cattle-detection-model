@@ -1,94 +1,97 @@
 """
-config.py
-Configuración centralizada del sistema AgroGuardian.
-Modifica estos parámetros para ajustar el comportamiento del sistema.
-TODAS las configuraciones se cargan desde aquí para facilitar ajustes sin editar código.
+config.py - Configuración centralizada de AgroGuardian
+
+Este archivo contiene todos los parámetros del sistema.
+Se carga una sola vez al iniciar el programa, por lo que los cambios
+requieren reiniciar la aplicación.
+
+Secciones:
+- YOLO detection: modelos, umbrales, tamaños
+- Tracking: persistencia de identidades
+- Counting: lógica de conteo de vacas
+- Features: activación/desactivación de características
 """
 
 # ==================== CONFIGURACIÓN YOLO ====================
-# Parámetros de inferencia del modelo de detección
 
-CONFIDENCE_THRESHOLD = 0.35  # Umbral de confianza para detección (0-1)
-                              # Valores bajos detectan más, pero tienen falsos positivos
-                              # Valores altos detectan menos, pero son más precisos
-                              # Recomendado: 0.25-0.4
-                              # OPTIMIZADO: Bboxes pequeños y precisos
+CONFIDENCE_THRESHOLD = 0.30  # Umbral de confianza mínima para considerar una detección
+                              # 0.30: Detecta mejor objetos lejanos/pequeños
+                              # 0.50+: Más preciso pero pierde objetos
+                              # Ajusta según precisión deseada
 
-IOU_THRESHOLD = 0.50        # Umbral de IoU (Intersection over Union) para NMS
-                              # (Non-Maximum Suppression): elimina boxes duplicadas/solapadas
-                              # Recomendado: 0.4-0.6
+IOU_THRESHOLD = 0.45        # Umbral de IoU para NMS (elimina boxes duplicadas)
+                              # Valores bajos = elimina más duplicados
+                              # Valores altos = mantiene boxes cercanos
 
-IMGSZ = 640             # Tamaño de imagen para la red YOLO
-                              # Valores comunes: 416, 640, 1024
-                              # Mayor = más precisión pero más lento
-                              # Recomendado: 640 para balance
-                              # OPTIMIZADO PARA VACAS EN MOVIMIENTO: 1024
+IMGSZ = 640                 # Tamaño de imagen que ve el modelo
+                              # 640 es el balance entre precisión y velocidad
+                              # Aumentar a 1024 si tienes GPU y necesitas más precisión
 
-DEVICE = 'cpu'               # 'cpu' para CPU, 'cuda' para GPU
-                              # GPU es 10-20x más rápido si está disponible
+DEVICE = 'cpu'              # 'cpu' para CPU, 'cuda' para GPU
+                              # GPU es 10-20x más rápido para inferencia
 
-CLASSES = [0]               # Clases COCO a detectar
-                              # 16 = vaca (cow)
-                              # 0 = persona (person)
-                              # [16] = solo vacas
-                              # [0, 16] = personas y vacas
-
-MODEL_PATH = './runs/runs/train_20260513_022538/weights/best.pt'  # Ruta al modelo YOLO
-                                      # Opciones: '../models/yolov8n.pt' (nano)
-                                      #           '../models/yolov8s.pt' (small - recomendado)
-                                      #           '../models/yolov8m.pt' (medium)
-                                      #           '../models/yolov8l.pt' (large)
-                                      # O: '../trained_models/yolov8_cows_YYYYMMDD.pt' (personalizado)
+# Ruta al modelo YOLO entrenado
+MODEL_PATH = '../runs/runs/train_20260519_162008/weights/best.pt'
+# Cuando reentrenes con más datos, actualiza a:
+# './trained_models/yolov8_cows_YYYYMMDD_improved.pt'
 
 # ==================== CONFIGURACIÓN TRACKER ====================
-# Parámetros del tracking (DeepSORT)
+# DeepSORT mantiene identidades de vacas entre frames
 
-MAX_AGE_TRACKER = 50        # Máximo número de frames que un track puede estar sin
-                              # actualización antes de ser eliminado (evita fantasmas)
-                              # Recomendado: 20-50
+MAX_AGE_TRACKER = 30        # Frames máximo sin actualización antes de eliminar track
+                              # Valores altos mantienen tracks de objetos ocluidos
+                              # Valores bajos = más estrictos (evita fantasmas)
 
-N_INIT_TRACKER = 5          # Número de frames para confirmar un track
-                              # (evita contar detecciones falsas transitorias)
-                              # Recomendado: 2-5
-                              # OPTIMIZADO PARA VACAS EN MOVIMIENTO: 2 (confirma rápido)
+N_INIT_TRACKER = 2          # Frames necesarios para confirmar un track como válido
+                              # Valores bajos confirman rápido (más sensible)
+                              # Valores altos requieren más frames (más robusto)
 
 # ==================== CONFIGURACIÓN DE CONTEO ====================
-# Parámetros para contar vacas de forma confiable
+# Estrategia: solo contar vacas estacionarias para evitar duplicados
 
-MOVE_THRESH = 7.0            # Umbral de movimiento en píxeles
-                              # Una vaca se considera "estacionaria" si no se mueve más de esto
-                              # en STATIONARY_FRAMES frames
-                              # Recomendado: 3-10
+MOVE_THRESH = 5.0           # Umbral de movimiento en píxeles
+                              # Si una vaca se mueve más de esto, se considera activa
+                              # Valores bajos = más estrictos
 
-STATIONARY_FRAMES = 15      # Número de frames consecutivos que una vaca debe estar
-                              # estacionaria para ser contada
-                              # Mayor = más confiable pero más lento
-                              # Recomendado: 10-30
+STATIONARY_FRAMES = 20      # Frames consecutivos sin movimiento para contar
+                              # Valores altos = más confiable pero más lento
+                              # Recomendado: 15-30 (depende de FPS del video)
 
 # ==================== CONFIGURACIÓN DE PROCESAMIENTO ====================
 
-FRAME_SKIP = 2               # Procesar cada Nth frame (1 = procesar todos)
-                              # Aumentar para procesar más rápido pero con menos precisión
-                              # Recomendado: 1 (procesar todos)
+FRAME_SKIP = 1              # Procesar cada Nth frame (1 = todos los frames)
+                              # Aumentar para más velocidad pero menos precisión
 
-LINE_POSITION = 0.5          # Relativo a la altura (0.5 = mitad, no usado actualmente)
+LINE_POSITION = 0.5         # Posición normalizada (0-1) para línea de conteo
+                              # Actualmente no se usa, reservado para futuro
 
-# ==================== NOTAS DE TUNING ====================
+
+# ==================== CARACTERÍSTICAS Y DETECCIÓN ====================
+# Sistema preparado para agregar detección de personas
+
+ENABLE_PERSON_DETECTION = False  # Cambiar a True cuando tengas modelo con clase "person"
+                                  # El sistema detecta automáticamente si está disponible
+
+# Este parámetro se sobrescribe automáticamente en detector.py:
+# Si el modelo entrenado contiene la clase "person",
+# ENABLE_PERSON_DETECTION se activa automáticamente
+
+
+# ==================== NOTAS DE AJUSTE ====================
 """
-Para MEJORAR DETECCIÓN DE VACAS CERCANAS Y EN MOVIMIENTO:
-1. Reducir CONFIDENCE_THRESHOLD (ej: 0.15-0.25)
-2. Usar modelo más grande (ej: yolov8s.pt en lugar de yolov8n.pt)
-3. Si tienes GPU, usar DEVICE='cuda'
-4. Aumentar IMGSZ a 1024 (más preciso pero lento)
+PARA MEJORAR DETECCIÓN DE VACAS:
+1. Reducir CONFIDENCE_THRESHOLD → 0.20 (más sensible, puede falsos positivos)
+2. Aumentar IMGSZ → 1024 (más precisión si tienes GPU)
+3. Usar GPU: DEVICE = 'cuda'
+4. Reentrenar modelo con dataset más grande
 
-Para MEJORAR CONTEO CONFIABLE (menos duplicados):
-1. Aumentar STATIONARY_FRAMES (ej: 20-30)
-2. Reducir MOVE_THRESH para ser más estricto
-3. Aumentar N_INIT_TRACKER (requiere más frames para confirmar)
+PARA MEJORAR CONTEO (menos duplicados):
+1. Aumentar STATIONARY_FRAMES → 30-40
+2. Reducir MOVE_THRESH → 3.0
+3. Aumentar N_INIT_TRACKER → 3-4
 
-Para MEJORAR PERFORMANCE:
-1. Usar modelo nano (yolov8n.pt)
-2. Reducir IMGSZ a 416
-3. Usar DEVICE='cuda' si está disponible
-4. Aumentar FRAME_SKIP (procesar menos frames)
+PARA AGREGAR DETECCIÓN DE PERSONAS:
+1. Reentrenar modelo con dataset que incluya personas
+2. ENABLE_PERSON_DETECTION se activará automáticamente
+3. Los paneles de UI se actualizarán automáticamente
 """

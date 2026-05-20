@@ -1,20 +1,27 @@
 """
-tracker.py
-Mantiene y actualiza identidades de vacas a lo largo de los frames usando DeepSORT.
-Parámetros de tracking configurables desde config.py
+tracker.py - Mantiene identidades consistentes de animales entre frames
+
+Usa DeepSORT para asociar detecciones a través del tiempo.
+Esto permite darle un ID único a cada vaca/persona y rastrearla.
 """
 
 from deep_sort_realtime.deepsort_tracker import DeepSort
 import numpy as np
 from config import MAX_AGE_TRACKER, N_INIT_TRACKER
 
+
 class Tracker:
     """
-    Tracker basado en DeepSORT que asocia detecciones entre frames.
-    Mantiene IDs consistentes para cada vaca detectada.
+    Tracker basado en DeepSORT.
+    
+    Función:
+    - Asocia detecciones entre frames
+    - Mantiene IDs consistentes para cada objeto detectado
+    - Filtra detecciones falsas transitorias
     """
+    
     def __init__(self):
-        """Inicializa DeepSORT con parámetros desde config.py"""
+        """Inicializa DeepSORT con parámetros de config.py"""
         try:
             self.tracker = DeepSort(
                 max_age=MAX_AGE_TRACKER,
@@ -27,34 +34,32 @@ class Tracker:
         """
         Actualiza tracks con nuevas detecciones.
         
+        Proceso:
+        1. Convierte formato de detecciones (XYXY → XYWH)
+        2. Pasa al tracker de DeepSORT
+        3. Filtra tracks confirmados (valida que existan suficiente frames)
+        4. Retorna solo objetos rastreados válidos
+        
         Args:
-            detections: Lista de tuplas (x1, y1, x2, y2, conf, class_id) del Detector
-            frame: Frame actual (np.ndarray)
+            detections: Lista de (x1, y1, x2, y2, conf, class_id)
+            frame: Frame actual (usado por DeepSORT para feature extraction)
         
         Returns:
-            Lista de dicts con keys: bbox, confidence, class_id, track_id
-            Solo retorna tracks confirmados (han existido por N_INIT_TRACKER frames)
+            Lista de dicts: {bbox, confidence, class_id, track_id}
         """
-        tracks = []
-        
-        # Si no hay detecciones, retorna lista vacía
         if len(detections) == 0:
             return []
         
         try:
-           # Convierte detecciones al formato esperado por DeepSORT
-           # DeepSORT espera: [x, y, width, height]
+            # Convertir formato XYXY → XYWH (lo que DeepSORT espera)
             raw_detections = []
-            
             for d in detections:
                 x1, y1, x2, y2, conf, class_id = d
-                # Convertir de XYXY → XYWH
                 w = x2 - x1
                 h = y2 - y1
-                
                 raw_detections.append(([x1, y1, w, h], conf, class_id))
             
-            # Actualiza tracker con las nuevas detecciones
+            # Actualizar tracker
             tracks = self.tracker.update_tracks(
                 raw_detections=raw_detections,
                 frame=frame
@@ -63,15 +68,14 @@ class Tracker:
             print(f"Error actualizando tracker: {e}")
             return []
 
+        # Filtrar y preparar salida
         output = []
         for t in tracks:
-            # Filtrado: solo tracks confirmados y que no se han perdido por mucho tiempo
-            # is_confirmed() asegura que el track ha sido visto en al menos N_INIT_TRACKER frames
-            # time_since_update == 0 significa que fue actualizado en este frame
+            # Solo usar tracks confirmados (evita contar falsas detecciones)
             if not t.is_confirmed():
                 continue
             
-            # Si el track no fue visto en este frame, lo descartamos (muy fresco o fantasma)
+            # Solo usar tracks actualizados en este frame (evita fantasmas)
             if t.time_since_update > 1:
                 continue
             
@@ -80,7 +84,7 @@ class Tracker:
             cls = t.det_class
             conf = t.det_conf
             
-            # Validación adicional de confidencia
+            # Validación de confianza
             if conf is None or conf < 0:
                 conf = 0.5
             
